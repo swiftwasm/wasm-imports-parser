@@ -17,17 +17,8 @@ npm install wasm-imports-parser
 import { parseImports } from 'wasm-imports-parser';
 
 const moduleBytes = new Uint8Array([
-    0x00, 0x61, 0x73, 0x6d, // magic number
-    0x01, 0x00, 0x00, 0x00, // version
-    // import section with one import
-    0x02, // section code
-    0x06, // section length
-    0x01, // number of imports
-    0x00, // module name length
-    0x00, // field name length
-    0x02, // import kind: memory
-    0x00, // limits flags
-    0x01, // initial pages: 1
+    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+    0x02, 0x06, 0x01, 0x00, 0x00, 0x02, 0x00, 0x01,
 ]);
 const imports = parseImports(moduleBytes);
 console.log(imports);
@@ -51,17 +42,8 @@ import { polyfill } from 'wasm-imports-parser/polyfill.js';
 const WebAssembly = polyfill(globalThis.WebAssembly);
 
 const moduleBytes = new Uint8Array([
-    0x00, 0x61, 0x73, 0x6d, // magic number
-    0x01, 0x00, 0x00, 0x00, // version
-    // import section with one import
-    0x02, // section code
-    0x06, // section length
-    0x01, // number of imports
-    0x00, // module name length
-    0x00, // field name length
-    0x02, // import kind: memory
-    0x00, // limits flags
-    0x01, // initial pages: 1
+    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00,
+    0x02, 0x06, 0x01, 0x00, 0x00, 0x02, 0x00, 0x01,
 ]);
 const module = await WebAssembly.compile(moduleBytes);
 const imports = WebAssembly.Module.imports(module);
