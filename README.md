@@ -1,5 +1,7 @@
 # wasm-imports-parser
 
+[![npm version](https://badge.fury.io/js/wasm-imports-parser.svg)](https://badge.fury.io/js/wasm-imports-parser)
+
 A simple parser for WebAssembly imports with [WebAssembly Type Reflection JS API](https://github.com/WebAssembly/js-types/blob/main/proposals/js-types/Overview.md) compatibility.
 
 Typically useful for constructing shared memory with a limit requested by imports of a WebAssembly module.
