@@ -47,7 +47,7 @@ function isStructurallyEqual(a, b) {
   return true;
 }
 
-async function check(wasmFilePath, getImports) {
+async function check(wasmFilePath) {
   const bytes = fs.readFileSync(wasmFilePath);
   let module;
   try {
