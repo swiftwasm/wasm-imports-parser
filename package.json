@@ -7,7 +7,11 @@
   "scripts": {
     "test": "node --experimental-wasm-type-reflection test/check.mjs && node test/check.mjs"
   },
-  "keywords": [],
+  "keywords": ["webassembly"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/swiftwasm/wasm-imports-parser.git"
+  },
   "author": "SwiftWasm Team",
   "license": "MIT"
 }
