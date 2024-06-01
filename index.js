@@ -1,23 +1,17 @@
+// @ts-check
 /**
- * @typedef {"i32" | "i64" | "f32" | "f64" | "funcref" | "externref"} ValueType
- * @typedef { { parameters: ValueType[], results: ValueType[] } } FunctionType
- * @typedef { { element: "funcref" | "externref", minimum: number, maximum?: number } } TableType
- * @typedef { { minimum: number, maximum?: number, shared: boolean, index: "i32" | "i64" } } MemoryType
- * @typedef { { value: ValueType, mutable: boolean } } GlobalType
+ * @typedef {import("./index.d.ts").ImportEntry } ImportEntry
+ * @typedef {import("./index.d.ts").FunctionType } FunctionType
+ * @typedef {import("./index.d.ts").TableType } TableType
+ * @typedef {import("./index.d.ts").MemoryType } MemoryType
+ * @typedef {import("./index.d.ts").ValueType } ValueType
  */
 
 /**
  * Parse a WebAssembly module bytes and return the imports entries.
  *
  * @param {BufferSource} moduleBytes - The WebAssembly module bytes.
- * @returns { (
- *  { module: string, name: string } & (
- *    { kind: "function", type: FunctionType } |
- *    { kind: "table", type: TableType } |
- *    { kind: "memory", type: MemoryType } |
- *    { kind: "global", type: GlobalType }
- *  )
- * )[] } - The imports entries.
+ * @returns {ImportEntry[]} - The import entries.
  * @throws {Error} - If the module bytes are invalid.
  *
  * @example
@@ -56,7 +50,13 @@ export function parseImports(moduleBytes) {
   parseMagicNumber(parseState);
   parseVersion(parseState);
 
+  /**
+   * @type {FunctionType[]}
+   */
   const types = [];
+  /**
+   * @type {ImportEntry[]}
+   */
   const imports = [];
 
   while (parseState.hasMoreBytes()) {
@@ -170,8 +170,14 @@ function parseVersion(parseState) {
   parseState.assertBytes(expected);
 }
 
+/**
+ * @returns {TableType}
+ */
 function parseTableType(parseState) {
   const elementType = parseState.readByte();
+  /**
+   * @type {"funcref" | "externref"}
+   */
   let element;
   switch (elementType) {
     case 0x70:
@@ -191,6 +197,9 @@ function parseTableType(parseState) {
   }
 }
 
+/**
+ * @returns {MemoryType}
+ */
 function parseLimits(parseState) {
   const flags = parseState.readByte();
   const minimum = parseState.readUnsignedLEB128();
@@ -212,6 +221,9 @@ function parseGlobalType(parseState) {
   return { value, mutable };
 }
 
+/**
+ * @returns {ValueType}
+ */
 function parseValueType(parseState) {
   const type = parseState.readByte();
   switch (type) {
@@ -237,11 +249,17 @@ function parseFunctionType(parseState) {
   if (form !== 0x60) {
     throw new Error(`Expected function type form 0x60, got ${form}`);
   }
+  /**
+   * @type {ValueType[]}
+   */
   const parameters = [];
   const parameterCount = parseState.readUnsignedLEB128();
   for (let i = 0; i < parameterCount; i++) {
     parameters.push(parseValueType(parseState));
   }
+  /**
+   * @type {ValueType[]}
+   */
   const results = [];
   const resultCount = parseState.readUnsignedLEB128();
   for (let i = 0; i < resultCount; i++) {

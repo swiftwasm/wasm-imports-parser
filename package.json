@@ -2,8 +2,8 @@
   "name": "wasm-imports-parser",
   "version": "1.0.0",
   "description": "A simple parser for WebAssembly imports",
-  "main": "index.js",
   "type": "module",
+  "main": "index.js",
   "scripts": {
     "test": "node --experimental-wasm-type-reflection test/check.mjs && node test/check.mjs"
   },

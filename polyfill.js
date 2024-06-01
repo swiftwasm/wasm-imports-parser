@@ -24,8 +24,8 @@ export const hasWasmTypeReflectionSupport = (() => {
  * Polyfill the WebAssembly object to support "type" field in the import object
  * returned by `WebAssembly.Module.imports` function.
  *
- * @param {WebAssembly} WebAssembly
- * @returns {WebAssembly}
+ * @param {typeof WebAssembly} WebAssembly
+ * @returns {typeof WebAssembly}
  * @example
  * import fs from "fs";
  * import { polyfill } from "wasm-imports-parser/polyfill";
