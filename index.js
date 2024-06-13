@@ -46,6 +46,17 @@
  * const { instance } = await WebAssembly.instantiate(moduleBytes, importObject);
  */
 export function parseImports(moduleBytes) {
+  if (moduleBytes instanceof Uint8Array) {
+    // no cast needed
+  } else if (moduleBytes instanceof ArrayBuffer) {
+    // cast ArrayBuffer to Uint8Array
+    moduleBytes = new Uint8Array(moduleBytes);
+  } else if (moduleBytes.buffer instanceof ArrayBuffer) {
+    // cast TypedArray or DataView to Uint8Array
+    moduleBytes = new Uint8Array(moduleBytes.buffer);
+  } else {
+    throw new Error("Argument must be a buffer source, like Uint8Array or ArrayBuffer");
+  }
   const parseState = new ParseState(moduleBytes);
   parseMagicNumber(parseState);
   parseVersion(parseState);

@@ -47,6 +47,20 @@ function isStructurallyEqual(a, b) {
   return true;
 }
 
+const minimalModuleBytes = new Uint8Array([
+  0x00, 0x61, 0x73, 0x6d, // magic number
+  0x01, 0x00, 0x00, 0x00, // version
+  // import section with one import
+  0x02, // section code
+  0x06, // section length
+  0x01, // number of imports
+  0x00, // module name length
+  0x00, // field name length
+  0x02, // import kind: memory
+  0x00, // limits flags
+  0x01, // initial pages: 1
+]);
+
 async function check(wasmFilePath) {
   const bytes = fs.readFileSync(wasmFilePath);
   let module;
@@ -78,21 +92,29 @@ async function check(wasmFilePath) {
   return true;
 }
 
+async function checkApiSurface() {
+  const bytes = minimalModuleBytes;
+  for (const source of [
+    bytes,
+    bytes.buffer,
+    new DataView(bytes.buffer),
+  ]) {
+    try {
+      parseImports(source);
+    } catch (e) {
+      process.stdout.write("\x1b[31mF\x1b[0m\n");
+      console.error(`Failed to parse imports from ${source}`);
+      console.error(e);
+      return false;
+    }
+    process.stdout.write("\x1b[32m.\x1b[0m");
+  }
+  return true;
+}
+
 async function checkPolyfill() {
-  const bytes = new Uint8Array([
-    0x00, 0x61, 0x73, 0x6d, // magic number
-    0x01, 0x00, 0x00, 0x00, // version
-    // import section with one import
-    0x02, // section code
-    0x06, // section length
-    0x01, // number of imports
-    0x00, // module name length
-    0x00, // field name length
-    0x02, // import kind: memory
-    0x00, // limits flags
-    0x01, // initial pages: 1
-  ]);
-  const polyfilledWebAssembly = await polyfill(WebAssembly);
+  const bytes = minimalModuleBytes;
+  const polyfilledWebAssembly = polyfill(WebAssembly);
   for (const getModule of [
     {
       name: "new WebAssembly.Module",
@@ -178,6 +200,11 @@ async function main() {
       }
     }
   }
+
+  process.stdout.write("\n");
+
+  console.log("Checking API surface");
+  checkApiSurface();
 
   process.stdout.write("\n");
 
