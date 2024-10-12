@@ -51,22 +51,28 @@ export function polyfill(WebAssembly) {
     for (const key in Object.getOwnPropertyDescriptors(WebAssembly)) {
         newWebAssembly[key] = WebAssembly[key];
     }
+
+    // Symbol to store parsed imports.
+    const polyfilledImportsSymbol = Symbol("polyfilledImportsSymbol");
+    const assignImports = (module, sourceBytes) => {
+        // Pre-parse the imports and store them in the module object
+        // to avoid retaining the whole source bytes in the memory.
+        module[polyfilledImportsSymbol] = parseImports(sourceBytes);
+    }
+
     // Hook the Module constructor to store the source bytes.
     const newModule = newWebAssembly.Module = function (bytes) {
         const module = new WebAssembly.Module(bytes);
-        module[sourceBytesSymbol] = bytes;
+        assignImports(module, bytes);
         Object.setPrototypeOf(module, newModule.prototype);
         return module;
     }
     Object.setPrototypeOf(newModule.prototype, WebAssembly.Module.prototype);
 
-    // Symbol to store the source bytes inside WebAssembly.Module object.
-    const sourceBytesSymbol = Symbol("sourceBytes");
-
     // Hook the compile function to store the source bytes.
     newWebAssembly.compile = async (source) => {
         const module = await WebAssembly.compile(source);
-        module[sourceBytesSymbol] = source;
+        assignImports(module, source);
         return module;
     };
 
@@ -76,19 +82,19 @@ export function polyfill(WebAssembly) {
             const response = await source;
             const clone = response.clone();
             const module = await WebAssembly.compileStreaming(response);
-            module[sourceBytesSymbol] = new Uint8Array(await clone.arrayBuffer());
+            assignImports(module, new Uint8Array(await clone.arrayBuffer()));
             return module;
         };
     }
 
     // Polyfill the WebAssembly.Module.imports function.
     newModule.imports = (module) => {
-        const sourceBytes = module[sourceBytesSymbol];
-        if (!sourceBytes) {
+        const parsedImports = module[polyfilledImportsSymbol];
+        if (!parsedImports) {
             // If the source bytes are not available for some reason, fallback to the original function.
             return WebAssembly.Module.imports(module);
         }
-        return parseImports(sourceBytes);
+        return parsedImports;
     };
 
     return newWebAssembly;
