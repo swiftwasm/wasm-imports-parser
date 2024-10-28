@@ -250,6 +250,8 @@ function parseValueType(parseState) {
       return "funcref";
     case 0x6f:
       return "externref";
+    case 0x7B:
+      return "v128";
     default:
       throw new Error(`Unknown value type ${type}`);
   }

@@ -16,6 +16,7 @@ function prepare(testsuitePath) {
     "utf8-import-field.wast",
     "utf8-import-module.wast",
     "linking.wast",
+    "simd_linking.wast",
   ]
 
   for (const file of files) {
