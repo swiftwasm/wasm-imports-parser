@@ -66,7 +66,7 @@ console.log(imports);
 |:-------|:-------|:-----|
 | V8     | :white_check_mark: | [Available in Chrome 78 and later](https://chromestatus.com/feature/5725002447978496), and Node.js 13.0.0 and later |
 | SpiderMonkey | :construction: | [Available in Firefox Nightly](https://bugzilla.mozilla.org/show_bug.cgi?id=1651725) |
-| JavaScriptCore | :x: | [Not available](https://github.com/WebKit/WebKit/blob/b50dcf22f189f2c47da11c0929f1204ba6ecac1f/Source/JavaScriptCore/wasm/js/WebAssemblyModuleConstructor.cpp#L103-L132) as of 2024-06 |
+| JavaScriptCore | :construction: | [Available in Safari Technology Preview 202 and later](https://developer.apple.com/documentation/safari-technology-preview-release-notes/stp-release-202) |
 
 ## License
 
