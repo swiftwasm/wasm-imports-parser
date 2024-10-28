@@ -1,6 +1,6 @@
 {
   "name": "wasm-imports-parser",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A simple parser for WebAssembly imports",
   "type": "module",
   "main": "index.js",
