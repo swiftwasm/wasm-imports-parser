@@ -60,11 +60,19 @@ export function polyfill(WebAssembly) {
         module[polyfilledImportsSymbol] = parseImports(sourceBytes);
     }
 
+    // Modify the module's prototype chain to make the following inheritance
+    // test pass:
+    // * `module instanceof WebAssembly.Module === true`
+    // * `module instanceof newWebAssembly.Module === true`
+    const prependInheritance = (module) => {
+        Object.setPrototypeOf(module, newModule.prototype);
+    }
+
     // Hook the Module constructor to store the source bytes.
     const newModule = newWebAssembly.Module = function (bytes) {
         const module = new WebAssembly.Module(bytes);
         assignImports(module, bytes);
-        Object.setPrototypeOf(module, newModule.prototype);
+        prependInheritance(module);
         return module;
     }
     Object.setPrototypeOf(newModule.prototype, WebAssembly.Module.prototype);
@@ -73,6 +81,7 @@ export function polyfill(WebAssembly) {
     newWebAssembly.compile = async (source) => {
         const module = await WebAssembly.compile(source);
         assignImports(module, source);
+        prependInheritance(module);
         return module;
     };
 
@@ -83,6 +92,7 @@ export function polyfill(WebAssembly) {
             const clone = response.clone();
             const module = await WebAssembly.compileStreaming(response);
             assignImports(module, new Uint8Array(await clone.arrayBuffer()));
+            prependInheritance(module);
             return module;
         };
     }

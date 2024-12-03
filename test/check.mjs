@@ -146,6 +146,18 @@ async function checkPolyfill() {
       } else {
         module = getModule.fn();
       }
+
+      if (module instanceof WebAssembly.Module === false) {
+        process.stdout.write("\x1b[31mF\x1b[0m\n");
+        console.error(`Expected module to be instance of the original WebAssembly.Module, but got something wrong by ${getModule.name}`);
+        return false;
+      }
+      if (module instanceof polyfilledWebAssembly.Module === false) {
+        process.stdout.write("\x1b[31mF\x1b[0m\n");
+        console.error(`Expected module to be instance of the polyfilled WebAssembly.Module, but got something wrong by ${getModule.name}`);
+        return false;
+      }
+
       imports = polyfilledWebAssembly.Module.imports(module);
     } catch (e) {
       process.stdout.write("\x1b[31mF\x1b[0m\n");
